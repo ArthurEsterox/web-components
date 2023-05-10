@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="controls">
+    <div class="control">
+      <label for="message" class="control-label">
+        Message
+      </label>
+      <input type="text" id="message" value="Custom Notification!" class="control-input" />
+    </div>
+
+    <div class="control">
+      <label for="header" class="control-label">
+        Header
+      </label>
+      <input type="text" id="header" value="Header" class="control-input" />
+    </div>
+
+    <div class="control">
+      <label for="footer" class="control-label">
+        Footer
+      </label>
+      <input type="text" id="footer" value="Footer" class="control-input" />
+    </div>
+
+    <div class="control">
+      <label for="border-color" class="control-label">
+        Border Color
+      </label>
+      <input type="color" id="border-color" value="#6762FF" class="control-input" />
+    </div>
+
+    <div class="control">
+      <label for="image" class="control-label">
+        Image
+      </label>
+      <input type="text" id="image" value="https://logowik.com/content/uploads/images/react7473.logowik.com.webp" class="control-input" />
+    </div>
+
+    <div class="control">
+      <label for="hide-mode" class="control-label">
+        Hide Mode
+      </label>
+      <select id="hide-mode" class="control-input">
+        <option selected value="minimize">Minimize</option>
+        <option value="hide">Hide</option>
+        <option value="none">None</option>
+      </select>
+    </div>
+
+    <div class="control">
+      <label for="count" class="control-label">
+        Count
+      </label>
+      <input type="number" id="count" value="1" class="control-input" />
+    </div>
+
+    <div class="control">
+      <label for="count-color" class="control-label">
+        Count Color
+      </label>
+      <input type="color" id="count-color" value="#6762FF" class="control-input" />
+    </div>
+  </div>
+
+  <custom-notification
+    id="notification"
+    border-color="#6762FF"
+    image="https://logowik.com/content/uploads/images/react7473.logowik.com.webp"
+    hide-mode="minimize"
+    minimize-timeout="10000"
+    count="1"
+    count-color="#6762FF"
+  >
+    <span slot="header" id="notification-header">Header</span>
+    <span id="notification-message">Custom Notification!</span>
+    <span slot="footer" id="notification-footer">Footer</span>
+  </custom-notification>
+
+  <script src="index.js"></script>
+  <script src="controls.js"></script>
+</body>
+</html>
