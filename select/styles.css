@@ -12,38 +12,11 @@ body {
   box-sizing: border-box;
 }
 
+.content {
+  display: flex;
+  gap: 1rem;
+}
+
 .wrapper {
   width: 250px;
-}
-
-.controls {
-  width: 100%;
-  display: flex;
-  align-items: flex-start;
-  flex-wrap: wrap;
-  gap: 1rem;
-  padding: 30px;
-}
-
-.control {
-  width: 18%;
-  display: flex;
-  flex-direction: column;
-}
-.control-label {
-  margin-bottom: 10px;
-}
-.control-input {
-  outline: none;
-  width: 100%;
-  height: 25px;
-  padding: 0 5px;
-  box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
-  border: none;
-  border-radius: 3.3px;
-  background-color: #ffffff;
-  transition: box-shadow .3s ease-in-out;
-}
-.control-input:focus {
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
 }

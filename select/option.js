@@ -4,11 +4,23 @@ optionTemplate.innerHTML = `
     * {
       box-sizing: border-box;
     }
+    :host {
+      display: flex;
+    }
+    :host([disabled]) .option {
+      opacity: 0.5;
+      cursor: default;
+      background-color: transparent !important;
+    }
+    
     .option {
       width: 100%;
       padding: 0.3rem 0.75rem;
       cursor: pointer;
       user-select: none;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
       transition: background-color .3s ease;
     }
     .option.active {
@@ -55,6 +67,10 @@ class Option extends HTMLElement {
   }
 
   handleClick() {
+    if (this.hasAttribute('disabled')) {
+      return;
+    }
+
     const value = this.getAttribute('value');
     const parentValue = this.parentElement.getAttribute('value');
 

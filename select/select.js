@@ -4,11 +4,21 @@ template.innerHTML = `
     * {
       box-sizing: border-box;
     }
+    .hide {
+      display: none !important;
+    }
     :host {
       position: relative;
       z-index: 1;
       display: flex;
     }
+    :host([disabled]) {
+      opacity: 0.5;
+    }
+    :host([disabled]) .select {
+      cursor: default;
+    }
+
     .select {
       width: 100%;
       padding: 0.5rem 0.75rem;
@@ -27,10 +37,15 @@ template.innerHTML = `
     .select.open .select-arrow {
       transform: rotate(180deg);
     }
+
     .select-placeholder {
       font-size: 16px;
       font-weight: 400;
       user-select: none;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+      max-width: 80%;
     }
     .select-arrow {
       margin-bottom: 1px;
@@ -49,6 +64,8 @@ template.innerHTML = `
       opacity: 0;
       visibility: hidden;
       transform: translateY(-10px);
+      max-height: 220px;
+      overflow-y: auto;
       transition: transform .3s ease, opacity .3s ease, visibility .3s ease;
     }
     .select-popup.open {
@@ -57,6 +74,14 @@ template.innerHTML = `
       visibility: visible;
       transform: translateY(0);
     }
+    .select-popup-empty {
+      width: 100%;
+      font-size: 18px;
+      font-weight: 500;
+      text-align: center;
+      padding: 10px;
+      user-select: none;
+    }
   </style>
   <div class="select">
     <span class="select-placeholder"></span>
@@ -64,6 +89,10 @@ template.innerHTML = `
     <svg class="select-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="14" height="14"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"/></svg>
   </div>
   <div class="select-popup">
+    <div class="select-popup-empty hide">
+      Empty
+    </div>
+
     <slot></slot>
   </div>
 `;
@@ -88,12 +117,15 @@ class Select extends HTMLElement {
     this.nodes.set('select', this.shadowRoot.querySelector('.select'));
     this.nodes.set('select-popup', this.shadowRoot.querySelector('.select-popup'));
     this.nodes.set('select-placeholder', this.shadowRoot.querySelector('.select-placeholder'));
+    this.nodes.set('select-popup-empty', this.shadowRoot.querySelector('.select-popup-empty'));
   }
 
   attachHandlers() {
     const select = this.nodes.get('select');
 
     document.addEventListener('click', this.handleDocumentClick);
+
+    this.addEventListener('custom-select', this.handleSelect.bind(this));
 
     if (select) {
       select.addEventListener('click', this.handleClick.bind(this));
@@ -114,7 +146,15 @@ class Select extends HTMLElement {
     }
   }
 
+  handleSelect(e) {
+    this.setAttribute('value', e.detail);
+  }
+
   handleClick() {
+    if (this.hasAttribute('disabled')) {
+      return;
+    }
+
     this.toggleOpen();
   }
 
@@ -177,8 +217,16 @@ class Select extends HTMLElement {
     }
   }
 
+  renderEmpty() {
+    const isEmpty = !this.children.length;
+    const emptyElement = this.nodes.get('select-popup-empty');
+
+    emptyElement.classList[isEmpty ? 'remove' : 'add']('hide');
+  }
+
   connectedCallback() {
     this.attachHandlers();
+    this.renderEmpty();
   }
 
   disconnectedCallback() {
