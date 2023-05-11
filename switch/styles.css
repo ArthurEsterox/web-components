@@ -1,0 +1,22 @@
+html, body {
+  margin: 0;
+  font-family: 'Rubik', sans-serif;
+}
+
+body {
+  padding: 1rem;
+  background-color: rgb(240, 240, 240);
+}
+
+*, *::after, *::before {
+  box-sizing: border-box;
+}
+
+.switch-group {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+.switch-group:not(:first-child) {
+  margin-top: 2rem;
+}
