@@ -129,7 +129,7 @@ class Switch extends HTMLElement {
       detail: isChecked,
     }));
 
-    if (this.hasAttribute('checked')) {
+    if (!isChecked) {
       return this.removeAttribute('checked');
     }
 
