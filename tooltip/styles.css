@@ -1,0 +1,55 @@
+html, body {
+  margin: 0;
+  font-family: 'Rubik', sans-serif;
+}
+
+body {
+  padding: 4rem;
+  background-color: rgb(240, 240, 240);
+}
+
+*, *::after, *::before {
+  box-sizing: border-box;
+}
+
+button {
+  height: 30px;
+  cursor: pointer;
+}
+
+.wrapper {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.groups {
+  width: 50%;
+  gap: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+.group {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
+  gap: 1rem;
+}
+.group.column {
+  flex-direction: column;
+}
+.group-center {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.inline-examples {
+  margin-top: 100px;
+}

@@ -2,6 +2,10 @@ html, body {
   font-family: 'Rubik', sans-serif;
 }
 
+body {
+  background-color: rgb(240, 240, 240);
+}
+
 *, *::after, *::before {
   box-sizing: border-box;
 }

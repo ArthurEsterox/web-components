@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tooltip</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="wrapper">
+    <div class="groups">
+      <div class="group">
+        <custom-tooltip position="top-start" text="Tooltip with position">
+          <button>Top-Start</button>
+        </custom-tooltip>
+
+        <custom-tooltip position="top" text="Tooltip with position">
+          <button>Top</button>
+        </custom-tooltip>
+
+        <custom-tooltip position="top-end" text="Tooltip with position">
+          <button>Top-End</button>
+        </custom-tooltip>
+      </div>
+    
+      <div class="group-center">
+        <div class="group column">
+          <custom-tooltip position="left-start" text="Tooltip with position">
+            <button>Left-Start</button>
+          </custom-tooltip>
+
+          <custom-tooltip position="left" text="Tooltip with position">
+            <button>Left</button>
+          </custom-tooltip>
+
+          <custom-tooltip position="left-end" text="Tooltip with position">
+            <button>Left-End</button>
+          </custom-tooltip>
+        </div>
+
+        <div class="group column">
+          <custom-tooltip position="right-start" text="Tooltip with position">
+            <button>Right-Start</button>
+          </custom-tooltip>
+
+          <custom-tooltip position="right" text="Tooltip with position">
+            <button>Right</button>
+          </custom-tooltip>
+
+          <custom-tooltip position="right-end" text="Tooltip with position">
+            <button>Right-End</button>
+          </custom-tooltip>
+        </div>
+      </div>
+  
+      <div class="group">
+        <custom-tooltip position="bottom-start" text="Tooltip with position">
+          <button>Bottom-Start</button>
+        </custom-tooltip>
+
+        <custom-tooltip position="bottom" text="Tooltip with position">
+          <button>Bottom</button>
+        </custom-tooltip>
+
+        <custom-tooltip position="bottom-end" text="Tooltip with position">
+          <button>Bottom-End</button>
+        </custom-tooltip>
+      </div>
+    </div>
+  </div>
+
+  <div class="group inline-examples">
+    <custom-tooltip text="Tooltip">
+      <button>Hover Trigger</button>
+    </custom-tooltip>
+
+    <custom-tooltip trigger="click" text="Tooltip">
+      <button>Click Trigger</button>
+    </custom-tooltip>
+
+    <custom-tooltip text="Lorem ipsum dolor, sit amet consectetur adipisicing elit. Soluta tempore quisquam dolorum, maiores facere facilis illo repellat libero atque! Ratione hic, repellendus deserunt asperiores adipisci eius.">
+      <button>Long Text</button>
+    </custom-tooltip>
+  </div>
+
+  <script src="index.js"></script>
+</body>
+</html>

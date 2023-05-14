@@ -136,8 +136,8 @@ class Select extends HTMLElement {
     document.removeEventListener('click', this.handleDocumentClick);
   }
 
-  handleDocumentClick(event) {
-    if (this.contains(event.target)) {
+  handleDocumentClick(e) {
+    if (this.contains(e.target)) {
       return;
     }
     
