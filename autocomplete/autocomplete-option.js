@@ -1,5 +1,5 @@
-const optionTemplate = document.createElement('template');
-optionTemplate.innerHTML = `
+const autocompleteOptionTemplate = document.createElement('template');
+autocompleteOptionTemplate.innerHTML = `
   <style>
     * {
       box-sizing: border-box;
@@ -7,17 +7,20 @@ optionTemplate.innerHTML = `
     :host {
       display: flex;
     }
-    :host([disabled]) .option {
+    :host([hide]) {
+      display: none !important;
+    }
+    :host([disabled]) .autocomplete-option {
       opacity: 0.5;
       cursor: default;
       background-color: transparent !important;
     }
 
-    :host([active]) .option {
+    :host([active]) .autocomplete-option {
       background-color: #dcdcdc !important;
     }
-    
-    .option {
+
+    .autocomplete-option {
       width: 100%;
       padding: 0.3rem 0.75rem;
       cursor: pointer;
@@ -27,16 +30,17 @@ optionTemplate.innerHTML = `
       white-space: nowrap;
       transition: background-color .3s ease;
     }
-    .option:hover {
+    .autocomplete-option:hover {
       background-color: #f0f0f0;
     }
   </style>
-  <div class="option">
+
+  <div class="autocomplete-option">
     <slot></slot>
   </div>
 `;
 
-class Option extends HTMLElement {
+class AutocompleteOption extends HTMLElement {
   nodes = new Map();
 
   constructor() {
@@ -44,17 +48,17 @@ class Option extends HTMLElement {
 
     this.attachShadow({ mode: 'open' });
 
-    this.shadowRoot.appendChild(optionTemplate.content.cloneNode(true));
-    
+    this.shadowRoot.appendChild(autocompleteOptionTemplate.content.cloneNode(true));
+
     this.attachNodes();
   }
 
   attachNodes() {
-    this.nodes.set('option', this.shadowRoot.querySelector('.option'));
+    this.nodes.set('autocomplete-option', this.shadowRoot.querySelector('.autocomplete-option'));
   }
 
   attachHandlers() {
-    const option = this.nodes.get('option');
+    const option = this.nodes.get('autocomplete-option');
 
     this.addEventListener('option-change', this.handleChange.bind(this));
 
@@ -72,24 +76,24 @@ class Option extends HTMLElement {
       return;
     }
 
-    const value = this.getAttribute('value');
+    const value = this.innerHTML;
     const parentValue = this.parentElement.getAttribute('value');
 
-    this.dispatchEvent(new CustomEvent('custom-select', {
+    this.dispatchEvent(new CustomEvent('auto-select', {
       detail: parentValue === value ? null : value,
       bubbles: true,
     }));
   }
 
   renderActive() {
-    const option = this.nodes.get('option');
+    const option = this.nodes.get('autocomplete-option');
 
     if (!option) {
       return;
     }
 
-    const value = this.getAttribute('value');
-    const parentValue = this.parentElement.getAttribute('value');
+    const value = this.innerHTML.toLowerCase();
+    const parentValue = this.parentElement.selected?.toLowerCase();
 
     if (value === parentValue) {
       this.setAttribute('active', '');
@@ -101,22 +105,6 @@ class Option extends HTMLElement {
   connectedCallback() {
     this.attachHandlers();
   }
-
-  attributeChangedCallback(attr, oldValue, newValue) {
-    switch (attr) {
-      case 'value': {
-        this.renderActive();
-        break;
-      }
-      default: {
-        break;
-      }
-    }
-  }
-
-  static get observedAttributes() {
-    return ['value'];
-  }
 }
 
-customElements.define('custom-option', Option);
+customElements.define('auto-complete-option', AutocompleteOption);
