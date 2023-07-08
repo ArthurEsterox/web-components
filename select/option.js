@@ -15,14 +15,20 @@ optionTemplate.innerHTML = `
 
     :host([active]) .option {
       background-color: #dcdcdc !important;
+      outline: none;
     }
     
     .option {
       width: 100%;
       padding: 0.3rem 0.75rem;
       cursor: pointer;
+      outline: none;
       user-select: none;
       text-overflow: ellipsis;
+      border: none;
+      text-align: left;
+      background-color: transparent;
+      font-size: 0.875rem;
       overflow: hidden;
       white-space: nowrap;
       transition: background-color .3s ease;
@@ -30,10 +36,13 @@ optionTemplate.innerHTML = `
     .option:hover {
       background-color: #f0f0f0;
     }
+    .option:focus-visible {
+      background-color: #dedede;
+    }
   </style>
-  <div class="option">
+  <button class="option">
     <slot></slot>
-  </div>
+  </button>
 `;
 
 class Option extends HTMLElement {
@@ -57,6 +66,7 @@ class Option extends HTMLElement {
     const option = this.nodes.get('option');
 
     this.addEventListener('option-change', this.handleChange.bind(this));
+    this.addEventListener('option-focus', this.handleFocus.bind(this));
 
     if (option) {
       option.addEventListener('click', this.handleClick.bind(this));
@@ -65,6 +75,14 @@ class Option extends HTMLElement {
 
   handleChange() {
     this.renderActive();
+  }
+
+  handleFocus() {
+    const option = this.nodes.get('option');
+  
+    if (option) {
+      option.focus();
+    }
   }
 
   handleClick() {
@@ -98,6 +116,21 @@ class Option extends HTMLElement {
     }
   }
 
+  renderDisabled(value) {
+    const option = this.nodes.get('option');
+
+    if (!option) {
+      return;
+    }
+    
+    if (value === null) {
+      option.setAttribute('tabindex', '0');
+      return;
+    }
+
+    option.setAttribute('tabindex', '-1');
+  }
+
   connectedCallback() {
     this.attachHandlers();
   }
@@ -108,6 +141,10 @@ class Option extends HTMLElement {
         this.renderActive();
         break;
       }
+      case 'disabled': {
+        this.renderDisabled(newValue);
+        break;
+      }
       default: {
         break;
       }
@@ -115,7 +152,7 @@ class Option extends HTMLElement {
   }
 
   static get observedAttributes() {
-    return ['value'];
+    return ['value', 'disabled'];
   }
 }
 

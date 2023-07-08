@@ -21,6 +21,8 @@ template.innerHTML = `
 
     .select {
       width: 100%;
+      outline: none;
+      border: none;
       padding: 0.5rem 0.75rem;
       border-radius: 4px;
       background-color: #ffffff;
@@ -29,13 +31,16 @@ template.innerHTML = `
       display: flex;
       align-items: center;
       justify-content: space-between;
-      transition: border-radius .3s ease;
+      transition: border-radius .3s ease, box-shadow .3s ease;
     }
     .select.open {
       border-radius: 4px 4px 0 0;
     }
     .select.open .select-arrow {
       transform: rotate(180deg);
+    }
+    .select:focus-visible {
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
     }
 
     .select-placeholder {
@@ -83,15 +88,15 @@ template.innerHTML = `
       user-select: none;
     }
   </style>
-  <div class="select">
+  <button class="select">
     <span class="select-placeholder"></span>
 
     <svg class="select-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="14" height="14"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"/></svg>
-  </div>
+  </button>
   <div class="select-popup">
-    <div class="select-popup-empty hide">
+    <span class="select-popup-empty hide">
       Empty
-    </div>
+    </span>
 
     <slot></slot>
   </div>
@@ -100,6 +105,7 @@ template.innerHTML = `
 class Select extends HTMLElement {
   nodes = new Map();
   open = false;
+  focused = -1;
 
   constructor() {
     super();
@@ -111,6 +117,7 @@ class Select extends HTMLElement {
     this.attachNodes();
 
     this.handleDocumentClick = this.handleDocumentClick.bind(this);
+    this.handleDocumentKeyDown = this.handleDocumentKeyDown.bind(this);
   }
 
   attachNodes() {
@@ -124,6 +131,7 @@ class Select extends HTMLElement {
     const select = this.nodes.get('select');
 
     document.addEventListener('click', this.handleDocumentClick);
+    document.addEventListener('keydown', this.handleDocumentKeyDown);
 
     this.addEventListener('custom-select', this.handleSelect.bind(this));
 
@@ -134,6 +142,7 @@ class Select extends HTMLElement {
 
   deattachHandlers() {
     document.removeEventListener('click', this.handleDocumentClick);
+    document.removeEventListener('keydown', this.handleDocumentKeyDown);
   }
 
   handleDocumentClick(e) {
@@ -143,6 +152,48 @@ class Select extends HTMLElement {
     
     if (this.open) {
       this.toggleOpen();
+    }
+  }
+
+  handleDocumentKeyDown(e) {
+    if (!this.open) {
+      return;
+    }
+
+    if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') {
+      return;
+    }
+
+    e.preventDefault();
+
+    const options = this.getOptionElements();
+
+    const activeOption = options.findIndex((option) => option === document.activeElement);
+    
+    if (activeOption > -1) {
+      this.focused = activeOption;
+    }
+
+    if (e.key === 'ArrowUp') {
+      if (this.focused > 0) {
+        this.focused -= 1;
+      } else {
+        this.focused = options.length - 1;
+      }
+    } else if (e.key === 'ArrowDown') {
+      if (this.focused >= (options.length - 1)) {
+        this.focused = 0;
+      } else {
+        this.focused += 1;
+      }
+    }
+
+    this.handleFocus(options[this.focused]);
+  }
+
+  handleFocus(option) {
+    if (option) {
+      option.dispatchEvent(new CustomEvent('option-focus'));
     }
   }
 
@@ -170,6 +221,10 @@ class Select extends HTMLElement {
 
     select.classList[method]('open');
     selectPopup.classList[method]('open');
+  }
+
+  getOptionElements() {
+    return Array.from(this.querySelectorAll('custom-option'));
   }
 
   getOptions() {
@@ -224,6 +279,21 @@ class Select extends HTMLElement {
     emptyElement.classList[isEmpty ? 'remove' : 'add']('hide');
   }
 
+  renderDisabled(value) {
+    const select = this.nodes.get('select');
+
+    if (!select) {
+      return;
+    }
+
+    if (value === null) {
+      select.setAttribute('tabindex', '0');
+      return;
+    }
+
+    select.setAttribute('tabindex', '-1');
+  }
+
   connectedCallback() {
     this.attachHandlers();
     this.renderEmpty();
@@ -243,6 +313,10 @@ class Select extends HTMLElement {
         this.renderValue(newValue);
         break;
       }
+      case 'disabled': {
+        this.renderDisabled(newValue);
+        break;
+      }
       default: {
         break;
       }
@@ -250,7 +324,7 @@ class Select extends HTMLElement {
   }
 
   static get observedAttributes() {
-    return ['placeholder', 'value'];
+    return ['placeholder', 'value', 'disabled'];
   }
 }
 
