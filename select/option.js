@@ -15,6 +15,7 @@ optionTemplate.innerHTML = `
 
     :host([active]) .option {
       background-color: #dcdcdc !important;
+      outline: none;
     }
     
     .option {
@@ -23,6 +24,10 @@ optionTemplate.innerHTML = `
       cursor: pointer;
       user-select: none;
       text-overflow: ellipsis;
+      border: none;
+      text-align: left;
+      background-color: transparent;
+      font-size: 0.875rem;
       overflow: hidden;
       white-space: nowrap;
       transition: background-color .3s ease;
@@ -31,9 +36,9 @@ optionTemplate.innerHTML = `
       background-color: #f0f0f0;
     }
   </style>
-  <div class="option">
+  <button class="option">
     <slot></slot>
-  </div>
+  </button>
 `;
 
 class Option extends HTMLElement {
@@ -98,6 +103,21 @@ class Option extends HTMLElement {
     }
   }
 
+  renderDisabled(value) {
+    const option = this.nodes.get('option');
+
+    if (!option) {
+      return;
+    }
+    
+    if (value === null) {
+      option.setAttribute('tabindex', '0');
+      return;
+    }
+
+    option.setAttribute('tabindex', '-1');
+  }
+
   connectedCallback() {
     this.attachHandlers();
   }
@@ -108,6 +128,10 @@ class Option extends HTMLElement {
         this.renderActive();
         break;
       }
+      case 'disabled': {
+        this.renderDisabled(newValue);
+        break;
+      }
       default: {
         break;
       }
@@ -115,7 +139,7 @@ class Option extends HTMLElement {
   }
 
   static get observedAttributes() {
-    return ['value'];
+    return ['value', 'disabled'];
   }
 }
 
