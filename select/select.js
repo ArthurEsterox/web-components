@@ -105,6 +105,7 @@ template.innerHTML = `
 class Select extends HTMLElement {
   nodes = new Map();
   open = false;
+  focused = -1;
 
   constructor() {
     super();
@@ -116,6 +117,7 @@ class Select extends HTMLElement {
     this.attachNodes();
 
     this.handleDocumentClick = this.handleDocumentClick.bind(this);
+    this.handleDocumentKeyDown = this.handleDocumentKeyDown.bind(this);
   }
 
   attachNodes() {
@@ -129,6 +131,7 @@ class Select extends HTMLElement {
     const select = this.nodes.get('select');
 
     document.addEventListener('click', this.handleDocumentClick);
+    document.addEventListener('keydown', this.handleDocumentKeyDown);
 
     this.addEventListener('custom-select', this.handleSelect.bind(this));
 
@@ -139,6 +142,7 @@ class Select extends HTMLElement {
 
   deattachHandlers() {
     document.removeEventListener('click', this.handleDocumentClick);
+    document.removeEventListener('keydown', this.handleDocumentKeyDown);
   }
 
   handleDocumentClick(e) {
@@ -148,6 +152,48 @@ class Select extends HTMLElement {
     
     if (this.open) {
       this.toggleOpen();
+    }
+  }
+
+  handleDocumentKeyDown(e) {
+    if (!this.open) {
+      return;
+    }
+
+    if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') {
+      return;
+    }
+
+    e.preventDefault();
+
+    const options = this.getOptionElements();
+
+    const activeOption = options.findIndex((option) => option === document.activeElement);
+    
+    if (activeOption > -1) {
+      this.focused = activeOption;
+    }
+
+    if (e.key === 'ArrowUp') {
+      if (this.focused > 0) {
+        this.focused -= 1;
+      } else {
+        this.focused = options.length - 1;
+      }
+    } else if (e.key === 'ArrowDown') {
+      if (this.focused >= (options.length - 1)) {
+        this.focused = 0;
+      } else {
+        this.focused += 1;
+      }
+    }
+
+    this.handleFocus(options[this.focused]);
+  }
+
+  handleFocus(option) {
+    if (option) {
+      option.dispatchEvent(new CustomEvent('option-focus'));
     }
   }
 
@@ -175,6 +221,10 @@ class Select extends HTMLElement {
 
     select.classList[method]('open');
     selectPopup.classList[method]('open');
+  }
+
+  getOptionElements() {
+    return Array.from(this.querySelectorAll('custom-option'));
   }
 
   getOptions() {

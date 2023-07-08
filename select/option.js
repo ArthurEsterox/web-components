@@ -22,6 +22,7 @@ optionTemplate.innerHTML = `
       width: 100%;
       padding: 0.3rem 0.75rem;
       cursor: pointer;
+      outline: none;
       user-select: none;
       text-overflow: ellipsis;
       border: none;
@@ -34,6 +35,9 @@ optionTemplate.innerHTML = `
     }
     .option:hover {
       background-color: #f0f0f0;
+    }
+    .option:focus-visible {
+      background-color: #dedede;
     }
   </style>
   <button class="option">
@@ -62,6 +66,7 @@ class Option extends HTMLElement {
     const option = this.nodes.get('option');
 
     this.addEventListener('option-change', this.handleChange.bind(this));
+    this.addEventListener('option-focus', this.handleFocus.bind(this));
 
     if (option) {
       option.addEventListener('click', this.handleClick.bind(this));
@@ -70,6 +75,14 @@ class Option extends HTMLElement {
 
   handleChange() {
     this.renderActive();
+  }
+
+  handleFocus() {
+    const option = this.nodes.get('option');
+  
+    if (option) {
+      option.focus();
+    }
   }
 
   handleClick() {
