@@ -7,10 +7,9 @@ switchTemplate.innerHTML = `
     :host {
       display: flex;
       width: fit-content;
-      cursor: pointer;
     }
 
-    :host([disabled]) {
+    :host([disabled]) .switch {
       cursor: default;
     }
     :host([disabled]) .switch-track {
@@ -67,6 +66,14 @@ switchTemplate.innerHTML = `
       display: flex;
       width: 34px;
       height: 14px;
+      padding: 0;
+      outline: none;
+      border: none;
+      cursor: pointer;
+      background-color: transparent;
+    }
+    .switch:focus-visible .switch-thumb {
+      box-shadow: 0 0 25px #000;
     }
     .switch-track {
       background-color: #000000;
@@ -85,14 +92,14 @@ switchTemplate.innerHTML = `
       border-radius: 50%;
       transform: translateX(-2px);
       box-shadow: 0px 2px 1px -1px rgba(0,0,0,0.2), 0px 1px 1px 0px rgba(0,0,0,0.14), 0px 1px 3px 0px rgba(0,0,0,0.12);
-      transition: background-color .15s ease, transform .15s ease;
+      transition: background-color .15s ease, transform .15s ease, box-shadow .15s ease;
     }
   </style>
   
-  <div class="switch">
-    <div class="switch-track"></div>
-    <div class="switch-thumb"></div>
-  </div>
+  <button type="button" class="switch" role="switch" aria-checked="false" tabindex="0">
+    <div class="switch-track" aria-hidden="true"></div>
+    <div class="switch-thumb" aria-hidden="true"></div>
+  </button>
 `;
 
 class Switch extends HTMLElement {
@@ -110,10 +117,16 @@ class Switch extends HTMLElement {
 
   attachNodes() {
     this.nodes.set('switch', this.shadowRoot.querySelector('.switch'));
+    this.nodes.set('switch-track', this.shadowRoot.querySelector('.switch-track'));
+    this.nodes.set('switch-thumb', this.shadowRoot.querySelector('.switch-thumb'));
   }
 
   attachHandlers() {
-    this.addEventListener('click', this.handleClick.bind(this));
+    const switchButton = this.nodes.get('switch');
+
+    if (switchButton) {
+      switchButton.addEventListener('click', this.handleClick.bind(this));
+    }
   }
 
   handleClick() {
@@ -136,12 +149,77 @@ class Switch extends HTMLElement {
     this.setAttribute('checked', '');
   }
 
+  renderDisabled(value) {
+    const switchButton = this.nodes.get('switch');
+
+    if (!switchButton) {
+      return;
+    }
+
+    if (value === null) {
+      switchButton.setAttribute('tabindex', '0');
+      return;
+    }
+
+    switchButton.setAttribute('tabindex', '-1');
+  }
+
+  renderLabel(value) {
+    const switchButton = this.nodes.get('switch');
+
+    if (!switchButton) {
+      return;
+    }
+
+    if (value === null) {
+      switchButton.removeAttribute('aria-label');
+      return;
+    }
+
+    switchButton.setAttribute('aria-label', value);
+  }
+  
+  renderChecked(value) {
+    const switchButton = this.nodes.get('switch');
+
+    if (!switchButton) {
+      return;
+    }
+
+    if (value === null) {
+      switchButton.setAttribute('aria-checked', 'false');
+      return;
+    }
+
+    switchButton.setAttribute('aria-checked', 'true');
+  }
+
   connectedCallback() {
     this.attachHandlers();
   }
 
+  attributeChangedCallback(attr, oldValue, newValue) {
+    switch (attr) {
+      case 'disabled': {
+        this.renderDisabled(newValue);
+        break;
+      }
+      case 'label': {
+        this.renderLabel(newValue);
+        break;
+      }
+      case 'checked': {
+        this.renderChecked(newValue);
+        break;
+      }
+      default: {
+        break;
+      }
+    }
+  }
+
   static get observedAttributes() {
-    return ['color', 'checked', 'disabled'];
+    return ['color', 'checked', 'disabled', 'label'];
   }
 }
 
