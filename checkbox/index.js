@@ -53,18 +53,18 @@ checkboxTemplate.innerHTML = `
       background-color: transparent;
       border: 2px solid #626465;
       cursor: pointer;
-      transition: border-color .3s ease, background-color .3s ease;
+      transition: border-color .2s ease, background-color .2s ease;
     }
     .checkbox-mark {
       position: absolute;
       fill: transparent;
-      transition: fill .3s ease;
+      transition: fill .2s ease;
     }
   </style>
 
-  <div class="checkbox">
+  <button type="button" class="checkbox" role="checkbox" aria-checked="false" tabindex="0">
     <svg class="checkbox-mark" xmlns="http://www.w3.org/2000/svg" viewBox="0 96 960 960" width="16px" height="16px"><path xmlns="http://www.w3.org/2000/svg" d="M378 815q-9 0-17.5-3.5T345 801L164 620q-14-14-14-34t14-34q14-14 33.5-14t34.5 14l146 146 350-349q14-14 33.5-14.5T795 349q14 14 14 34t-14 34L411 801q-7 7-15.5 10.5T378 815Z"/></svg>
-  </div>
+  </button>
 `;
 
 class Checkbox extends HTMLElement {
@@ -82,10 +82,15 @@ class Checkbox extends HTMLElement {
 
   attachNodes() {
     this.nodes.set('checkbox', this.shadowRoot.querySelector('.checkbox'));
+    this.nodes.set('checkbox-mark', this.shadowRoot.querySelector('.checkbox-mark'));
   }
 
   attachHandlers() {
-    this.addEventListener('click', this.handleClick.bind(this));
+    const checkbox = this.nodes.get('checkbox');
+
+    if (checkbox) {
+      checkbox.addEventListener('click', this.handleClick.bind(this));
+    }
   }
 
   handleClick() {
@@ -108,12 +113,79 @@ class Checkbox extends HTMLElement {
     this.setAttribute('checked', '');
   }
 
+  renderDisabled(value) {
+    const checkbox = this.nodes.get('checkbox');
+
+    if (!checkbox) {
+      return;
+    }
+
+    if (value === null) {
+      checkbox.setAttribute('tabindex', '0');
+      checkbox.removeAttribute('disabled');
+      return;
+    }
+
+    checkbox.setAttribute('tabindex', '-1');
+    checkbox.setAttribute('disabled', '');
+  }
+
+  renderLabel(value) {
+    const checkbox = this.nodes.get('checkbox');
+
+    if (!checkbox) {
+      return;
+    }
+
+    if (value === null) {
+      checkbox.removeAttribute('aria-label');
+      return;
+    }
+
+    checkbox.setAttribute('aria-label', value);
+  }
+
+  renderChecked(value) {
+    const checkbox = this.nodes.get('checkbox');
+
+    if (!checkbox) {
+      return;
+    }
+
+    if (value === null) {
+      checkbox.setAttribute('aria-checked', 'false');
+      return;
+    }
+
+    checkbox.setAttribute('aria-checked', 'true');
+  }
+
   connectedCallback() {
     this.attachHandlers();
   }
 
+  attributeChangedCallback(attr, oldValue, newValue) {
+    switch (attr) {
+      case 'disabled': {
+        this.renderDisabled(newValue);
+        break;
+      }
+      case 'label': {
+        this.renderLabel(newValue);
+        break;
+      }
+      case 'checked': {
+        this.renderChecked(newValue);
+        break;
+      }
+      default: {
+        break;
+      }
+    }
+  }
+
   static get observedAttributes() {
-    return ['color', 'checked', 'disabled'];
+    return ['label', 'color', 'checked', 'disabled'];
   }
 }
 
